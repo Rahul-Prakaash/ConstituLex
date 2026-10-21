@@ -2,6 +2,7 @@ import { readFileSync, readdirSync } from "node:fs";
 import path from "node:path";
 import { PGlite } from "@electric-sql/pglite";
 import { pg_trgm } from "@electric-sql/pglite/contrib/pg_trgm";
+import { pgcrypto } from "@electric-sql/pglite/contrib/pgcrypto";
 import { unaccent } from "@electric-sql/pglite/contrib/unaccent";
 import { vector } from "@electric-sql/pglite-pgvector";
 import { loadCorpus } from "./corpus";
@@ -10,7 +11,7 @@ import { vectorLiteral } from "./embed";
 import { loadStatements } from "./load";
 
 export async function freshDatabase(): Promise<PGlite> {
-  const pg = await PGlite.create({ extensions: { vector, unaccent, pg_trgm } });
+  const pg = await PGlite.create({ extensions: { vector, unaccent, pg_trgm, pgcrypto } });
   const dir = path.join(process.cwd(), "supabase", "migrations");
   for (const file of readdirSync(dir).filter((f) => f.endsWith(".sql")).sort()) {
     await pg.exec(readFileSync(path.join(dir, file), "utf8"));
@@ -18,10 +19,15 @@ export async function freshDatabase(): Promise<PGlite> {
   await pg.transaction(async (tx) => {
     for (const s of loadStatements(loadCorpus())) await tx.query(s.text, s.params);
   });
+  const { CONSTITULEX_ADMIN_USER: user, CONSTITULEX_ADMIN_PASSWORD: password } = process.env;
+  if (user && password) await pg.query("select public.admin_create($1, $2)", [user, password]);
   return pg;
 }
 
-const SCALAR = new Set(["case_detail", "corpus_stats"]);
+const SCALAR = new Set([
+  "case_detail", "corpus_stats", "admin_login", "admin_session", "admin_logout",
+  "admin_change_password", "admin_overview", "admin_create", "log_search", "verify_audit_chain",
+]);
 const CASTS: Record<string, string> = { query_embedding: "::extensions.vector", ids: "::text[]" };
 
 export function pgliteDb(pg: PGlite): Db {

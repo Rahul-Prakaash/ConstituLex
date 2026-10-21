@@ -31,7 +31,7 @@ describe("schema", () => {
     const { rows } = await pg.query<{ relname: string; relrowsecurity: boolean }>(
       `select relname, relrowsecurity from pg_class
        where relnamespace = 'public'::regnamespace and relkind = 'r'`);
-    expect(rows.length).toBe(5);
+    expect(rows.length).toBe(10);
     expect(rows.every((r) => r.relrowsecurity)).toBe(true);
   });
 
