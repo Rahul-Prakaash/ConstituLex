@@ -67,66 +67,6 @@ All of it is Postgres too:
 > [!IMPORTANT]
 > Searches are logged for the Usage tab as the question, the mode and the answer band — no IP address, no cookie, nothing about who asked.
 
-## Run it
-
-**Without a Supabase project** — the same schema in an in-process Postgres (PGlite + pgvector):
-
-```bash
-npm install
-npm run dev:local                     # http://localhost:3000
-```
-
-Set `CONSTITULEX_ADMIN_USER` and `CONSTITULEX_ADMIN_PASSWORD` first if you want an administrator in the local database.
-
-**On Supabase:**
-
-1. Create a project at [supabase.com](https://supabase.com).
-2. Copy `.env.example` to `.env.local` and fill it in:
-
-   | Variable | Where to find it |
-   |---|---|
-   | `NEXT_PUBLIC_SUPABASE_URL` | *Settings → API* — the project URL |
-   | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | *Settings → API* — the publishable key |
-   | `SUPABASE_SERVICE_ROLE_KEY` | *Settings → API* — the secret key, used only by `db:seed` to upload the PDFs |
-   | `DATABASE_URL` | *Connect → Session pooler* (port 5432) |
-
-3. Then:
-
-   ```bash
-   npm install
-   npm run db:setup                    # schema, 30 judgments, 493 Articles, 30 PDFs into Storage
-   npm run admin:create -- <username>  # prints a generated password, once
-   npm run dev
-   ```
-
-> [!TIP]
-> Migrations are idempotent, so `db:setup` can be re-run at any time. `supabase/migrations/` also works with `supabase db push`.
-
-> [!WARNING]
-> `.env.local` holds the secret key and the database password. It is git-ignored — keep it that way, and never prefix the secret key with `NEXT_PUBLIC_`.
-
-The first search downloads the embedding model (about 90 MB) into `.cache/models`; `npm run model:fetch` does it ahead of time. After that it works offline, and `CONSTITULEX_OFFLINE=1` forbids any download.
-
-## Scripts
-
-| Command | What it does |
-|---|---|
-| `npm run dev` · `dev:local` | The app, against Supabase · against the in-process Postgres |
-| `npm run db:migrate` | Apply `supabase/migrations/*.sql` through `DATABASE_URL` |
-| `npm run db:seed` | Load the corpus in one transaction, and upload the PDFs if the secret key is set |
-| `npm run admin:create -- <name>` | Create an administrator, or reset one's password |
-| `npm test` | The suite, against real Postgres + pgvector — no setup needed |
-| `npm run check:embeddings` | Re-embed every case in TypeScript and compare with the stored vectors |
-| `npm run typecheck` · `build` | Type-check · production build |
-
-## API
-
-```http
-GET /api/search?q=...&mode=semantic|keyword|hybrid&limit=5&domain=privacy
-```
-
-Returns the ranked judgments with their scores, the confidence band and the timings.
-
 ## Layout
 
 ```text
@@ -137,8 +77,7 @@ src/lib/embed.ts       query embeddings — transformers.js, same model, same 25
 src/lib/db.ts          supabase.rpc() behind a one-method interface
 src/lib/local.ts       the same interface over PGlite, for tests and dev:local
 src/app/               the pages, the console, the server actions and the API route
-data/                  the corpus and the judgment PDFs
-tests/                 ranking parity, full text, fusion, related cases, sign-in, lock-out, sessions, audit chain
+tests/                 ranking parity, full text, fusion, related cases, sign-in, lock-out, sessions, audit chain (for reading)
 ```
 
 ## From MongoDB + Neo4j to one Postgres
@@ -154,3 +93,9 @@ The original ConstituLex split its data across two databases. Here every role la
 | Neo4j `:RELATED_TO` | `related_cases()`, one SQL join |
 | GridFS | Supabase Storage, bucket `judgments` |
 | scrypt, lock-out and a hash-chained audit log in Python | the same ideas as `pgcrypto` and PL/pgSQL behind row level security |
+
+## About this repository
+
+This repository is published so the code can be read and inspected in full: the retrieval functions in SQL, the TypeScript that calls them, the administrator's security model and the tests. It is deliberately not a ready-to-run package. The corpus, the loading and deployment scripts and all keys are not included.
+
+Copyright Rahul Prakaash V and Aditya Karthik. All rights reserved.
