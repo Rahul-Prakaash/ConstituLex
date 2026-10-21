@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Fraunces, Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
 import "./globals.css";
+import "./admin.css";
 
 const fraunces = Fraunces({ subsets: ["latin"], variable: "--font-fraunces", axes: ["SOFT", "WONK", "opsz"], style: ["normal", "italic"] });
 const geist = Geist({ subsets: ["latin"], variable: "--font-geist" });
@@ -32,6 +33,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <span className="pill-tech">
               <i /> Postgres · pgvector
             </span>
+            <Link href="/admin" className="admin-link">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                <path d="M12 3 4.5 6v5.5c0 4.6 3.1 8.2 7.5 9.5 4.4-1.3 7.5-4.9 7.5-9.5V6L12 3Z" />
+              </svg>
+              Administrator
+            </Link>
           </header>
           {children}
           <footer className="foot-site">
