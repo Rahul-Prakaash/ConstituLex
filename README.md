@@ -26,7 +26,7 @@ ConstituLex is a plain-language search over Indian constitutional case law. Ever
 > [!NOTE]
 > ConstituLex is a retrieval and citation aid over a fixed, verified corpus of 30 judgments and 493 Articles. It is not legal advice.
 
-## ✨ What it does
+## What it does
 
 <table>
 <tr>
@@ -49,7 +49,7 @@ ConstituLex is a plain-language search over Indian constitutional case law. Ever
 
 When nothing clears the measured threshold (0.23), the page says so plainly instead of pointing at law that does not apply.
 
-## 🛡️ The administrator's console
+## The administrator's console
 
 <img src="docs/admin-console.png" alt="The administrator console" width="860" />
 
@@ -67,7 +67,7 @@ All of it is Postgres too:
 > [!IMPORTANT]
 > Searches are logged for the Usage tab as the question, the mode and the answer band — no IP address, no cookie, nothing about who asked.
 
-## 🚀 Run it
+## Run it
 
 **Without a Supabase project** — the same schema in an in-process Postgres (PGlite + pgvector):
 
@@ -107,7 +107,7 @@ Set `CONSTITULEX_ADMIN_USER` and `CONSTITULEX_ADMIN_PASSWORD` first if you want 
 
 The first search downloads the embedding model (about 90 MB) into `.cache/models`; `npm run model:fetch` does it ahead of time. After that it works offline, and `CONSTITULEX_OFFLINE=1` forbids any download.
 
-## 🧰 Scripts
+## Scripts
 
 | Command | What it does |
 |---|---|
@@ -119,7 +119,7 @@ The first search downloads the embedding model (about 90 MB) into `.cache/models
 | `npm run check:embeddings` | Re-embed every case in TypeScript and compare with the stored vectors |
 | `npm run typecheck` · `build` | Type-check · production build |
 
-## 🔌 API
+## API
 
 ```http
 GET /api/search?q=...&mode=semantic|keyword|hybrid&limit=5&domain=privacy
@@ -127,7 +127,7 @@ GET /api/search?q=...&mode=semantic|keyword|hybrid&limit=5&domain=privacy
 
 Returns the ranked judgments with their scores, the confidence band and the timings.
 
-## 🗂️ Layout
+## Layout
 
 ```text
 supabase/migrations/   the schema, every retrieval function, and the admin system
@@ -141,7 +141,7 @@ data/                  the corpus and the judgment PDFs
 tests/                 ranking parity, full text, fusion, related cases, sign-in, lock-out, sessions, audit chain
 ```
 
-## 🧭 From MongoDB + Neo4j to one Postgres
+## From MongoDB + Neo4j to one Postgres
 
 The original ConstituLex split its data across two databases. Here every role lands in Postgres, and the tests hold the port to the original's behaviour: for seven recorded questions the ranking is identical to the Python engine's, and the TypeScript query embedding matches the Python one to cosine 1.000000.
 
