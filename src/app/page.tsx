@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Inspector } from "@/components/Inspector";
 import { ResultCard } from "@/components/ResultCard";
+import { HashScroll } from "@/components/HashScroll";
 import { SearchForm } from "@/components/SearchForm";
 import { Setup } from "@/components/Setup";
 import { Wheel } from "@/components/Wheel";
@@ -37,6 +38,7 @@ async function Landing() {
 
   return (
     <main>
+      <HashScroll />
       <section className="hero">
         <div>
           <div className="kicker">Constitution of India · Supreme Court</div>
