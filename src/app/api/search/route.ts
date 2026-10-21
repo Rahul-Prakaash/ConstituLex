@@ -16,6 +16,9 @@ export async function GET(req: NextRequest) {
   try {
     const { db } = await backend();
     const r = await search(db, q, { mode, limit, domain: p.get("domain") || null });
+    await db
+      .rpc("log_search", { p_query: q, p_mode: mode, p_band: r.band, p_top: r.hits[0]?.card.id ?? null, p_ms: Math.round(r.timings.totalMs) })
+      .catch(() => null);
     return NextResponse.json({
       query: r.query,
       mode: r.mode,

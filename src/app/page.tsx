@@ -176,6 +176,9 @@ async function Results({ query, mode }: { query: string; mode: Mode }) {
   }
 
   const top = result.hits[0];
+  await db
+    .rpc("log_search", { p_query: query, p_mode: mode, p_band: result.band, p_top: top?.card.id ?? null, p_ms: Math.round(result.timings.totalMs) })
+    .catch(() => null);
   return (
     <main>
       <SearchForm query={query} mode={mode} compact />
